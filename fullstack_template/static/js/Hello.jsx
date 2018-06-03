@@ -27,7 +27,7 @@ export default class Hello extends React.Component {
         return (
             <Grid>
                 <Row>
-                <Col md={7} mdOffset={5}>
+                <Col md={2}>
                     <h1>{this.state.greeting}</h1>
                     <hr/>
                 </Col>
@@ -35,7 +35,7 @@ export default class Hello extends React.Component {
                 <Row>
                 <Col md={7} mdOffset={5}>
                     <Button bsSize="large" bsStyle="danger" onClick={this.getPythonHello}>
-                    Say Hello!
+                    Say hello!
                     </Button>
                 </Col>
                 </Row>
