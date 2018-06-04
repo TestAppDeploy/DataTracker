@@ -1,26 +1,11 @@
-.page-header {
-    min-height: 100%;
-    text-align: center;
-    background-image: url('../images/header.jpg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    margin-top: -15px;
-}
-.header-contents {
-    top: 50%;
-    position:absolute;
-}
-.header-contents h1 {
-    font-size: 120px;
-    font-weight: 300;
-}
-.header-contents button {
-    font-size: 35px;
-    border-radius: 30px;
-    font-weight: 300;
+#RBC_logo{
+  height: 60px;
+  width: 60px;
 }
 
-.header-contents button:focus {
-    outline: None;
+.Graph_block{
+  height: 300px;
+  background-color: rgb(204,204,204, 0.3);
+  margin: 10px;
+  border-radius: 10px;
 }
