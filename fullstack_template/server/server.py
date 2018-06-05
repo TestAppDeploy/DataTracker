@@ -15,6 +15,9 @@ def hello():
     # This allows for easier unit and integration testing of your functions.
     return get_hello()
 
+@app.route('/2') # take note of this decorator syntax, it's a common pattern
+def MainLayout():
+    return render_template('MainLayout.jsx')
 
 def get_hello():
     greeting_list = ['Ciao', 'Hei', 'Salut', 'Hola', 'Hallo', 'Hej']
