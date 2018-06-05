@@ -1,6 +1,5 @@
 import React from "react";
 import { Container, Row, Col } from 'reactstrap';
-import MyNavbar from '../MyNavbar/MyNavbar.jsx';
 import {Line} from 'react-chartjs-2';
 import {Bar} from 'react-chartjs-2';
 
@@ -134,7 +133,7 @@ const data = {
 };
 
 export default class Hello extends React.Component {
-  
+
 
 displayName: 'LineExample';
 displayName: 'BarExample';
@@ -143,7 +142,6 @@ displayName: 'MixExample';
 render() {
   return (
     <div>
-      <MyNavbar />
 
       <Container>
         <Row>
