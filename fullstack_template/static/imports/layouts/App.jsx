@@ -1,11 +1,9 @@
 import React from "react";
-import Hello from "./Hello";
+import Hello from "../components/Hello/Hello.jsx";
 import { PageHeader } from "react-bootstrap";
 
-require('../css/fullstack.css');
-var $ = require('jquery');
 
-import HeaderBackgroundImage from '../images/header.jpg';
+var $ = require('jquery');
 
 export default class App extends React.Component {
   render () {
