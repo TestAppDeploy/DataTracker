@@ -17,7 +17,7 @@ const MainLayout = () => {
         <Router>
           <Switch>
           <Route exact path="/" component={App} />
-          <Route path="/2" component={App2} />
+          <Route path="/a" component={App2} />
           </Switch>
         </Router>
       </main>

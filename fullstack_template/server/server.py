@@ -3,8 +3,9 @@ from flask import Flask, render_template
 
 app = Flask(__name__, static_folder='../static/dist', template_folder='../static/client')
 
-@app.route('/')
-def index():
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
     return render_template('index.html')
 
 
@@ -14,10 +15,6 @@ def hello():
     # rather than have actual implementation code here.
     # This allows for easier unit and integration testing of your functions.
     return get_hello()
-
-@app.route('/2') # take note of this decorator syntax, it's a common pattern
-def MainLayout():
-    return render_template('MainLayout.jsx')
 
 def get_hello():
     greeting_list = ['Ciao', 'Hei', 'Salut', 'Hola', 'Hallo', 'Hej']
