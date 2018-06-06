@@ -1,14 +1,18 @@
-import random
-from flask import Flask, render_template
-from bokeh.plotting import figure
+from flask import Flask, render_template, jsonify, request
+from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
+from bokeh.models.sources import AjaxDataSource
+
 
 app = Flask(__name__, static_folder='../static/dist', template_folder='../static/client')
 
 @app.route('/dashboard/')
 def show_dashboard():
     plots = []
+    plots.append(make_ajax_plot())
     plots.append(make_plot())
+    plots.append(make_plot2())
+    plots.append(make_plot3())
 
     return render_template('dashboard.html', plots=plots)
 
@@ -19,6 +23,49 @@ def make_plot():
     y = [2**v for v in x]
 
     plot.line(x, y, line_width=4)
+
+    script, div = components(plot)
+    return script, div
+
+def make_plot2():
+    plot = figure(plot_height=100, sizing_mode='scale_width')
+
+    x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    y = [2**v for v in x]
+
+    plot.line(x, y, line_width=4)
+
+    script, div = components(plot)
+    return script, div
+
+def make_plot3():
+    plot = figure(plot_height=300, sizing_mode='scale_width')
+
+    x = [0, 10, 25, 35, 42, 52, 66, 77, 88, 92]
+    y = [2**v for v in x]
+
+    plot.line(x, y, line_width=4)
+
+    script, div = components(plot)
+    return script, div
+
+x, y = 0, 0
+
+@app.route('/data/', methods=['POST'])
+def data():
+    global x, y
+    x += 1
+    y = x//4
+    return jsonify(x=[x], y=[y])
+
+def make_ajax_plot():
+    source = AjaxDataSource(data_url=request.url_root + 'data/',
+                            polling_interval=20, mode='append')
+
+    source.data = dict(x=[], y=[])
+
+    plot = figure(x_range=[0,1000], y_range=[10, 2000], plot_height=300, sizing_mode='scale_width')
+    plot.line('x', 'y', source=source, line_width=4)
 
     script, div = components(plot)
     return script, div
