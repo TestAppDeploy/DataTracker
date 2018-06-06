@@ -2,9 +2,22 @@ import React from "react";
 import { Container, Row, Col } from 'reactstrap';
 import {Line} from 'react-chartjs-2';
 import {Bar} from 'react-chartjs-2';
+import Fred from 'node-fred'
 
-require('./Hello.css');
+
+require('./Home.css');
 var $ = require('jquery');
+
+let apiKey = '9191e886eb8b7e932d92df410fbf0c9e'
+const fred = new Fred(apiKey);
+
+fred.categories.getCategory(125)
+  .then((res) => {
+    console.log('Category', res);
+  })
+  .catch((err) => {
+    console.error('Error', err);
+  })
 
 const mixdata = {
   // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -132,7 +145,26 @@ const data = {
   ]
 };
 
-export default class Hello extends React.Component {
+export default class Home extends React.Component {
+
+  constructor(props) {
+        super(props);
+        this.state = {greeting: 'Hello ' + this.props.name};
+
+        // This binding is necessary to make `this` work in the callback
+        this.getPythonHello = this.getPythonHello.bind(this);
+    }
+
+    personaliseGreeting(greeting) {
+        this.setState({greeting: greeting + ' ' + this.props.name + '!'});
+    }
+
+    getPythonHello() {
+        $.get(window.location.href + 'data', (data) => {
+            console.log(data);
+            this.personaliseGreeting(data);
+        });
+    }
 
 
 displayName: 'LineExample';
@@ -142,7 +174,13 @@ displayName: 'MixExample';
 render() {
   return (
     <div>
-
+      <Container>
+        <Row>
+          <Col>
+            <h3>Graphing data from past days</h3>
+          </Col>
+        </Row>
+      </Container>
       <Container>
         <Row>
           <Col className="Graph_block">
