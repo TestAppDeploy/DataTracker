@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request
 from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
 from bokeh.models.sources import AjaxDataSource
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, CDSView, IndexFilter
 from fred import Fred
 import sys
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
@@ -85,17 +85,21 @@ params = {
 'sort_order':'asc'
 }
 
-res = fr.category.children(1)
+res = fr.series.tags('GNPCA')
 
-print (res)
+res1 = res['series_count']
+print (res1)
 
 def fred_plot():
-    source = ColumnDataSource(res)
 
-    source.data = dict(x=[], y=[])
+#    x=[res['popularity']]
+#    y=[res['series_count']]
 
-    plot = figure(x_range=[0,1000], y_range=[10, 2000], plot_height=250, sizing_mode='scale_width')
-    plot.line('x', 'y', source=source, line_width=4)
+
+    plot = figure(x_range=[0,1000], y_range=[0, 200000], plot_height=250, sizing_mode='scale_width')
+    plot.line(source=res, x='popularity', y='series_count', line_width=4)
+
+
 
     script, div = components(plot)
     return script, div
