@@ -90,17 +90,17 @@ def fred_plot():
 #    y=[res['series_count']]
 
 
-    plot = figure(y_range=[0, 2000], plot_height=250, x_axis_type='datetime', sizing_mode='scale_width')
+    plot = figure(y_range=[0, 350], plot_height=250, x_axis_type='datetime', sizing_mode='scale_width')
     plot.line(source=res, x='date', y='value',  line_width=4)
 
-    plot.xaxis.axis_label = "Popularity"
+    plot.xaxis.axis_label = "Year"
     plot.xaxis.axis_label_standoff = 10
     plot.xaxis.axis_label_text_font_style = "normal"
-    plot.yaxis.axis_label = "Series Count"
+    plot.yaxis.axis_label = "Index 1982-1984=100"
     plot.xaxis.axis_label_standoff = 10
     plot.yaxis.axis_label_text_font_style = "normal"
 
-    plot.add_layout(Title(text="FRED Data", align="center"), "above")
+    plot.add_layout(Title(text="Consumer Price Index for All Urban Consumers", align="center"), "above")
 
 
 
