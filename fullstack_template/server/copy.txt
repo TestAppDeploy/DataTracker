@@ -2,13 +2,53 @@ from flask import Flask, render_template, jsonify, request
 from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
 from bokeh.models.sources import AjaxDataSource
-from bokeh.models import ColumnDataSource
-from fred import Fred
-import sys
-fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
+import io
+import requests
+import pandas as pd
 
 
 app = Flask(__name__, static_folder='../static/dist', template_folder='../static/client')
+
+base = "https://api.iextrading.com/1.0/"
+
+def get_last_price(symbol):
+    payload = {
+        "format": "csv",
+        "symbols": symbol
+    }
+    endpoint = "tops/last"
+
+    raw = requests.get(base + endpoint, params=payload)
+    raw = io.BytesIO(raw.content)
+    prices_df = pd.read_csv(raw, sep=",")
+    prices_df["time"] = pd.to_datetime(prices_df["time"], unit="ms")
+    prices_df["display_time"] = prices_df["time"].dt.strftime("%m-%d-%Y %H:%M:%S.%f")
+
+    return prices_df
+
+    data = ColumnDataSource(dict(time=[], display_time=[], price=[]))
+
+def update_price():
+    new_price = get_last_price(symbol=TICKER)
+    data.stream(dict(time=new_price["time"],
+                     display_time=new_price["display_time"],
+                     price=new_price["price"]),
+                10000)
+    return 'a'
+
+def iex_plot():
+
+    plot = figure(plot_width=800,
+                        plot_height=400,
+                        x_axis_type='datetime',
+                        )
+
+    plot.line(source=data, x='time', y='price')
+    plot.title.text = "IEX Real Time Price: " + TICKER
+
+    script, div = components(plot)
+    return script, div
+
 
 def make_plot():
     plot = figure(plot_height=250, sizing_mode='scale_width')
@@ -68,29 +108,7 @@ def data():
 
 def make_ajax_plot():
     source = AjaxDataSource(data_url=request.url_root + 'data/',
-                            polling_interval=20000, mode='append')
-
-    source.data = dict(x=[], y=[])
-
-    plot = figure(x_range=[0,1000], y_range=[10, 2000], plot_height=250, sizing_mode='scale_width')
-    plot.line('x', 'y', source=source, line_width=4)
-
-    script, div = components(plot)
-    return script, div
-
-params = {
-'tag_group_id':'gen',
-'limit':10,
-'exclude_tag_names':'services',
-'sort_order':'asc'
-}
-
-res = fr.category.children(1)
-
-print (res)
-
-def fred_plot():
-    source = ColumnDataSource(res)
+                            polling_interval=2000, mode='append')
 
     source.data = dict(x=[], y=[])
 
@@ -103,22 +121,14 @@ def fred_plot():
 @app.route('/dashboard/')
 def show_dashboard():
     plots = []
-    plots.append(fred_plot())
     plots.append(make_ajax_plot())
     plots.append(make_plot())
     plots.append(make_plot2())
     plots.append(make_plot3())
     plots.append(chart())
+    plots.append(iex_plot())
 
     return render_template('index.html', plots=plots)
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
