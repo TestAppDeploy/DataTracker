@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request
 from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
 from bokeh.models.sources import AjaxDataSource
-from bokeh.models import ColumnDataSource, CDSView, IndexFilter
+from bokeh.models import ColumnDataSource, CDSView, IndexFilter, Title
 from fred import Fred
 import sys
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
@@ -97,7 +97,16 @@ def fred_plot():
 
 
     plot = figure(x_range=[0,1000], y_range=[0, 200000], plot_height=250, sizing_mode='scale_width')
-    plot.line(source=res, x='popularity', y='series_count', line_width=4)
+    plot.line(source=res, x='popularity', y='series_count',  line_width=4)
+
+    plot.xaxis.axis_label = "Popularity"
+    plot.xaxis.axis_label_standoff = 10
+    plot.xaxis.axis_label_text_font_style = "normal"
+    plot.yaxis.axis_label = "Series Count"
+    plot.xaxis.axis_label_standoff = 10
+    plot.yaxis.axis_label_text_font_style = "normal"
+
+    plot.add_layout(Title(text="FRED Data", align="center"), "above")
 
 
 
