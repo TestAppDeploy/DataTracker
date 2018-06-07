@@ -78,17 +78,11 @@ def make_ajax_plot():
     script, div = components(plot)
     return script, div
 
-params = {
-'tag_group_id':'gen',
-'limit':10,
-'exclude_tag_names':'services',
-'sort_order':'asc'
-}
 
-res = fr.series.tags('GNPCA')
+res = fr.series.observations('CPIAUCSL')
 
-res1 = res['series_count']
-print (res1)
+#res1 = res['series_count']
+#print (res1)
 
 def fred_plot():
 
@@ -96,8 +90,8 @@ def fred_plot():
 #    y=[res['series_count']]
 
 
-    plot = figure(x_range=[0,1000], y_range=[0, 200000], plot_height=250, sizing_mode='scale_width')
-    plot.line(source=res, x='popularity', y='series_count',  line_width=4)
+    plot = figure(y_range=[0, 2000], plot_height=250, x_axis_type='datetime', sizing_mode='scale_width')
+    plot.line(source=res, x='date', y='value',  line_width=4)
 
     plot.xaxis.axis_label = "Popularity"
     plot.xaxis.axis_label_standoff = 10
