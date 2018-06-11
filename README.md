@@ -1,22 +1,21 @@
-# Project Title
-
-Data Tracking App V1
+# Data Tracking App V1
 
 ## Overview
 
 This application is intended to allow data to be aggregated to be easily collected, graphed, and analyzed from online databases such as the Federal Reserve website. This guide provides a top level overview of the technology underlying the data tracking app.
 
-### Table of Contents
+## Table of Contents
 
-[Headers](#headers)  
-[Emphasis](#emphasis)  
-...snip...    
-<a name="headers"/>
-## Headers
+[Key Terms](#key_terms)  
+[App Structure](#emphasis)  
 
-```
-Give examples
-```
+<a name="key_terms"/>
+## Key Terms
+
+#### Github (www.github.com)
+  Github is a software which allows programmers to store their files and track the versions of their app. The folders for this app are stored on Github in a private repository called "DataTrackingApp". This means that
+
+
 
 ### Installing
 

@@ -60,8 +60,10 @@ def some_plot():
         title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
         y_axis_label = str(fr.series.details(api).units.values)
         y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_low=fr.series.observations(api)['value'].min
-        y_axis_high=fr.series.observations(api)['value'].max
+        y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 3)
+        y_axis_high=min(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+
+
 
         plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=300, x_axis_type='datetime', sizing_mode='scale_width')
         plot.line(source=datasource, x='date', y='value',  line_width=2)
