@@ -4,7 +4,7 @@
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.css" rel="stylesheet" type="text/css">
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.16.min.css" rel="stylesheet" type="text/css">
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.16.min.css" rel="stylesheet" type="text/css">
-    <link type="text/css" href="index.css" />
+  <!--  <link type="text/css" href="index.css" /> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Embed Demo</title>
 
@@ -12,13 +12,7 @@
   <body>
 
 <style type='text/css'>
-    #graphblock{
-      height: auto;
-      padding: 10px;
-      background-color: rgb(204,204,204, 0.2);
-      margin: 10px;
-      border-radius: 10px;
-    }
+
 
     #form{
       margin: auto;
@@ -26,9 +20,6 @@
       margin-bottom: 15px;
     }
 
-    .bk-canvas{
-      border-radius: 6px;
-    }
     #a{
       color: red;
     }
@@ -44,19 +35,7 @@
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Features</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Pricing</a>
-      </li>
-    </ul>
-  </div>
+
 </nav>
 <div class="container-fluid">
   <div class="row">
@@ -68,11 +47,11 @@
 </div>
 
 
-<div class="container-fluid">
+<div class="container">
   <div class="row">
 
     {% for plot in plots %}
-      <div class="col-lg-5" id="graphblock">
+      <div class="col-lg-6" id="graphblock">
         {% for part in plot %}
 
 

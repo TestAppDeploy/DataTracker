@@ -17,7 +17,7 @@ Real_GDP = fr.series.observations('A191RL1Q225SBEA')
 #Create Graph
 def Urban_Index_Plot():
 
-    plot = figure(y_range=[0, 280], plot_height=300, x_axis_type='datetime', sizing_mode='scale_width')
+    plot = figure(y_range=[0, 280], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
     plot.line(source=Urban_Index, x='date', y='value',  line_width=4)
 
     plot.xaxis.axis_label = "Year"
@@ -35,7 +35,7 @@ def Urban_Index_Plot():
 
 def Real_GDP_Plot():
 
-    plot = figure(y_range=[-15, 20], plot_height=300, x_axis_type='datetime', sizing_mode='scale_width')
+    plot = figure(y_range=[-15, 20], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
     plot.line(source=Real_GDP, x='date', y='value',  line_width=2)
 
     plot.xaxis.axis_label = "Year"
@@ -64,8 +64,7 @@ def some_plot():
         y_axis_high=min(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
 
 
-
-        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=300, x_axis_type='datetime', sizing_mode='scale_width')
+        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
         plot.line(source=datasource, x='date', y='value',  line_width=2)
 
         plot.xaxis.axis_label = "Year"
@@ -103,7 +102,6 @@ hover = HoverTool(tooltips=[
  formatters={
         'date' : 'datetime', # use 'datetime' formatter for 'date' field
     })
-
 
 
 
