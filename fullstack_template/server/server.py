@@ -1,8 +1,10 @@
 from flask import Flask, render_template, jsonify, request
-from bokeh.plotting import figure, output_file, show
+import numpy as np
+from bokeh.plotting import figure, output_file, show, ColumnDataSource
+from bokeh.layouts import row, widgetbox
 from bokeh.embed import components
 from bokeh.models.sources import AjaxDataSource
-from bokeh.models import ColumnDataSource, CDSView, IndexFilter, Title, TapTool, HoverTool
+from bokeh.models import ColumnDataSource, CDSView, IndexFilter, Title, TapTool, HoverTool, CustomJS, Slider
 from fred import Fred
 import sys
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
@@ -53,7 +55,7 @@ def Real_GDP_Plot():
 
 def some_plot():
 
-    if request.method == 'POST':
+    if (request.method == 'POST' and request.form['api']):
         api= request.form['api']
         datasource= fr.series.observations(api)
         title= str(fr.series.details(api).title.values)
@@ -61,7 +63,42 @@ def some_plot():
         y_axis_label = str(fr.series.details(api).units.values)
         y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
         y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 3)
-        y_axis_high=min(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+        y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+
+
+        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+        plot.line(source=datasource, x='date', y='value',  line_width=2)
+
+        plot.xaxis.axis_label = "Year"
+        plot.xaxis.axis_label_standoff = 10
+        plot.xaxis.axis_label_text_font_style = "normal"
+        plot.yaxis.axis_label = y_axis_label
+        plot.xaxis.axis_label_standoff = 10
+        plot.yaxis.axis_label_text_font_style = "normal"
+        plot.add_tools(hover)
+
+        plot.add_layout(Title(text=title, align="center"), "above")
+
+        some_plot.counter += 1
+
+        script, div = components(plot)
+        return script, div
+    else:
+        return print('string')
+
+some_plot.counter = 0
+
+def file_plot():
+
+    if (request.method == 'POST' and some_plot()==False):
+        file= request.form['file']
+        datasource= pd.read_csv(file, index_col=False)
+        title= str(file.title.values)
+        title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+        y_axis_label = str(file.units.values)
+        y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+        y_axis_low=min(file['value']) - min((file['value']) * 3)
+        y_axis_high=max(file['value']) + max((file['value']) * 1.5)
 
 
         plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
@@ -82,6 +119,7 @@ def some_plot():
     else:
         return print('string')
 
+
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
 
@@ -92,6 +130,8 @@ def show_dashboard():
     plots.append(Real_GDP_Plot())
     if some_plot():
         plots.append(some_plot())
+    if file_plot():
+        plots.append(file_plot())
 
     return render_template('index.html', plots=plots)
 
