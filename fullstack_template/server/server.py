@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request
-import numpy as np
+from decimal import Decimal
+import pandas as pd
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
 from bokeh.layouts import row, widgetbox
 from bokeh.embed import components
@@ -55,7 +56,7 @@ def Real_GDP_Plot():
 
 def some_plot():
 
-    if (request.method == 'POST' and request.form['api']):
+    if (request.method == 'POST' and file_plot()==False):
         api= request.form['api']
         datasource= fr.series.observations(api)
         title= str(fr.series.details(api).title.values)
@@ -88,9 +89,38 @@ def some_plot():
 
 some_plot.counter = 0
 
+
+
+def file_plot1():
+
+        datasource= pd.read_csv('./DGS10(1).csv')
+
+        datasource['DGS10'] = datasource['DGS10'].apply(pd.to_numeric, errors='coerce')
+        #datasource['DGS10']= datasource[pd.notnull(datasource)]
+        datasource= datasource.dropna(how='any')
+        datasource['DATE']= pd.to_datetime(datasource['DATE'])
+        y_axis_low=(float(datasource['DGS10'].min())) - (float(datasource['DGS10'].min() * 3))
+        y_axis_high=(float(datasource['DGS10'].max())) + (float(datasource['DGS10'].max() * 1.5))
+
+
+        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+        plot.line(x=datasource['DATE'], y=datasource['DGS10'], line_width=2)
+
+        plot.xaxis.axis_label = "Year"
+        plot.xaxis.axis_label_standoff = 10
+        plot.xaxis.axis_label_text_font_style = "normal"
+        plot.xaxis.axis_label_standoff = 10
+        plot.yaxis.axis_label_text_font_style = "normal"
+        plot.add_tools(hover)
+
+        #plot.add_layout(Title(text=title, align="center"), "above")
+
+        script, div = components(plot)
+        return script, div
+
 def file_plot():
 
-    if (request.method == 'POST' and some_plot()==False):
+    if (request.method == 'POST'):
         file= request.form['file']
         datasource= pd.read_csv(file, index_col=False)
         title= str(file.title.values)
@@ -113,7 +143,7 @@ def file_plot():
         plot.add_tools(hover)
 
         plot.add_layout(Title(text=title, align="center"), "above")
-
+        return print(file)
         script, div = components(plot)
         return script, div
     else:
@@ -128,10 +158,10 @@ def show_dashboard():
 #Call Graph Function
     plots.append(Urban_Index_Plot())
     plots.append(Real_GDP_Plot())
+    plots.append(file_plot1())
     if some_plot():
         plots.append(some_plot())
-    if file_plot():
-        plots.append(file_plot())
+
 
     return render_template('index.html', plots=plots)
 
