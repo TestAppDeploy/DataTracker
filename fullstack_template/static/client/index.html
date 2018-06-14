@@ -34,6 +34,19 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
   <a class="navbar-brand" href="#"><img src="https://www.seeklogo.net/wp-content/uploads/2016/11/rbc-logo-preview-400x400.png" width="35" height="35" class="d-inline-block align-top" alt="">
     Data Tracker</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+    <li class="nav-item active">
+     <a class="nav-link" href="#">Scenarios<span class="sr-only">(current)</span></a>
+   </li>
+   <li class="nav-item active">
+    <a class="nav-link" href="#">Scrape Data<span class="sr-only">(current)</span></a>
+  </li>
+  <li class="nav-item active">
+   <a class="nav-link" href="#">Download Report<span class="sr-only">(current)</span></a>
+ </li>
+</ul>
+</div>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -47,24 +60,25 @@
 <div class="container-fluid">
   <div class="row">
       <form method="POST"  id="form">
-            <select name="select">
+        <input type="number" name="multiple" placeholder="multiple" step="0.001" />
+            <select name="select" placeholder="model">
               <option value="None">
-
+                model
               </option>
               <option value="1">
-                1
+                Scenario 1
               </option>
               <option value="2">
-                2
+                Scenario 2
               </option>
               <option value="3">
-                3
+                Scenario 3
               </option>
               <option value="4">
-                4
+                Scenario 4
               </option>
             </select>
-        <input name="api" />
+        <input name="api" placeholder="API Key" />
         <input name="api" type="submit" />
       </form>
   </div>

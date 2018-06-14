@@ -86,65 +86,76 @@ def Real_GDP_Plot():
 
 def some_plot():
 
-    if (request.method == 'POST' and request.form['select'] == '1'):
-        api= request.form['api']
-        datasource= fr.series.observations(api)
-        title= str(fr.series.details(api).title.values)
-        title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_label = str(fr.series.details(api).units.values)
-        y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 3)
-        y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+    if 'select' in request.form:
+        if (request.method == 'POST' and request.form['select'] == '1'):
+            api= request.form['api']
+            datasource= fr.series.observations(api)
+            title= str(fr.series.details(api).title.values)
+            title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_label = str(fr.series.details(api).units.values)
+            y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
+            y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
 
+            multiple= float(request.form['multiple'])
+            datasource['value']*=multiple
 
-        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-        plot.line(source=datasource, x='date', y='value',  line_width=2)
+            plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(source=datasource, x='date', y='value',  line_width=2)
 
-        plot.xaxis.axis_label = "Year"
-        plot.xaxis.axis_label_standoff = 10
-        plot.xaxis.axis_label_text_font_style = "normal"
-        plot.yaxis.axis_label = y_axis_label
-        plot.xaxis.axis_label_standoff = 10
-        plot.yaxis.axis_label_text_font_style = "normal"
-        plot.add_tools(hover)
+            plot.xaxis.axis_label = "Year"
+            plot.xaxis.axis_label_standoff = 10
+            plot.xaxis.axis_label_text_font_style = "normal"
+            plot.yaxis.axis_label = y_axis_label
+            plot.xaxis.axis_label_standoff = 10
+            plot.yaxis.axis_label_text_font_style = "normal"
+            plot.add_tools(hover)
 
-        plot.add_layout(Title(text=title, align="center"), "above")
+            plot.add_layout(Title(text=title, align="center"), "above")
 
-        script, div = components(plot)
-        return script, div
+            script, div = components(plot)
+            return script, div
+        else:
+            return print('string')
     else:
-        return print('string')
+        return print('some_plot did not run')
+
+
 
 def some_plot1():
+    if 'select' in request.form:
+        if (request.method == 'POST' and request.form['select'] == '2'):
+            api= request.form['api']
+            datasource= fr.series.observations(api)
+            title= str(fr.series.details(api).title.values)
+            title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_label = str(fr.series.details(api).units.values)
+            y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
+            y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
 
-    if (request.method == 'POST' and request.form['select'] == '2'):
-        api= request.form['api']
-        datasource= fr.series.observations(api)
-        title= str(fr.series.details(api).title.values)
-        title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_label = str(fr.series.details(api).units.values)
-        y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
-        y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+            multiple= float(request.form['multiple'])
+            datasource['value']*=multiple
 
+            plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(source=datasource, x='date', y='value',  line_width=2)
 
-        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-        plot.line(source=datasource, x='date', y='value',  line_width=2)
+            plot.xaxis.axis_label = "Year"
+            plot.xaxis.axis_label_standoff = 10
+            plot.xaxis.axis_label_text_font_style = "normal"
+            plot.yaxis.axis_label = y_axis_label
+            plot.xaxis.axis_label_standoff = 10
+            plot.yaxis.axis_label_text_font_style = "normal"
+            plot.add_tools(hover)
 
-        plot.xaxis.axis_label = "Year"
-        plot.xaxis.axis_label_standoff = 10
-        plot.xaxis.axis_label_text_font_style = "normal"
-        plot.yaxis.axis_label = y_axis_label
-        plot.xaxis.axis_label_standoff = 10
-        plot.yaxis.axis_label_text_font_style = "normal"
-        plot.add_tools(hover)
+            plot.add_layout(Title(text=title, align="center"), "above")
 
-        plot.add_layout(Title(text=title, align="center"), "above")
-
-        script, div = components(plot)
-        return script, div
+            script, div = components(plot)
+            return script, div
+        else:
+            return print('string')
     else:
-        return print('string')
+        return print('some_plot1 did not run')
 
 
 
