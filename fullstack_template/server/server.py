@@ -53,6 +53,7 @@ def Urban_Index_Plot():
     plot = figure(y_range=[0, 280], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
     plot.line(source=Urban_Index, x='date', y='value',  line_width=4)
 
+    plot.toolbar.logo = None
     plot.xaxis.axis_label = "Year"
     plot.xaxis.axis_label_standoff = 10
     plot.xaxis.axis_label_text_font_style = "normal"
@@ -71,6 +72,7 @@ def Real_GDP_Plot():
     plot = figure(y_range=[-15, 20], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
     plot.line(source=Real_GDP, x='date', y='value',  line_width=2)
 
+    plot.toolbar.logo = None
     plot.xaxis.axis_label = "Year"
     plot.xaxis.axis_label_standoff = 10
     plot.xaxis.axis_label_text_font_style = "normal"
@@ -103,6 +105,7 @@ def some_plot():
             plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
             plot.line(source=datasource, x='date', y='value',  line_width=2)
 
+            plot.toolbar.logo = None
             plot.xaxis.axis_label = "Year"
             plot.xaxis.axis_label_standoff = 10
             plot.xaxis.axis_label_text_font_style = "normal"
@@ -140,6 +143,7 @@ def some_plot1():
             plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
             plot.line(source=datasource, x='date', y='value',  line_width=2)
 
+            plot.toolbar.logo = None
             plot.xaxis.axis_label = "Year"
             plot.xaxis.axis_label_standoff = 10
             plot.xaxis.axis_label_text_font_style = "normal"
@@ -185,6 +189,7 @@ def file_plot():
         plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
         plot.line(x=datasource['DATE'], y=datasource['CPIAUCSL'], line_width=2)
 
+        plot.toolbar.logo = None
         plot.xaxis.axis_label = "Year"
         plot.xaxis.axis_label_standoff = 10
         plot.xaxis.axis_label_text_font_style = "normal"
@@ -198,6 +203,7 @@ def file_plot():
         return script, div
     else:
         return print ('string')
+
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
