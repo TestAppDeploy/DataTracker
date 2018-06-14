@@ -86,7 +86,7 @@ def Real_GDP_Plot():
 
 def some_plot():
 
-    if (request.method == 'POST' and file_plot()==False):
+    if (request.method == 'POST' and request.form['select'] == '1'):
         api= request.form['api']
         datasource= fr.series.observations(api)
         title= str(fr.series.details(api).title.values)
@@ -117,14 +117,14 @@ def some_plot():
 
 def some_plot1():
 
-    if (request.method == 'POST' and request.form['select'] == True):
+    if (request.method == 'POST' and request.form['select'] == '2'):
         api= request.form['api']
         datasource= fr.series.observations(api)
         title= str(fr.series.details(api).title.values)
         title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
         y_axis_label = str(fr.series.details(api).units.values)
         y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 3)
+        y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
         y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
 
 
@@ -151,25 +151,28 @@ def some_plot1():
 
 def file_plot():
 
-    if request.method == 'POST':
+    if (request.method == 'POST' and 'file' in request.files):
 
         file = request.files['file']
 
         filename = data.save(file)
+        url = data.url(filename)
 
-        datasource= pd.read_csv('./Uploads/File1.csv')
+        datasource= pd.read_csv(url)
+
+        print(datasource)
 
 
-        datasource['DGS10'] = datasource['DGS10'].apply(pd.to_numeric, errors='coerce')
+        datasource['CPIAUCSL'] = datasource['CPIAUCSL'].apply(pd.to_numeric, errors='coerce')
         #datasource['DGS10']= datasource[pd.notnull(datasource)]
-        datasource= datasource.dropna(how='any')
+        datasource = datasource.dropna(how='any')
         datasource['DATE']= pd.to_datetime(datasource['DATE'])
-        y_axis_low=(float(datasource['DGS10'].min())) - (float(datasource['DGS10'].min() * 3))
-        y_axis_high=(float(datasource['DGS10'].max())) + (float(datasource['DGS10'].max() * 1.5))
+        y_axis_low=(float(datasource['CPIAUCSL'].min())) - (float(datasource['CPIAUCSL'].min() * 3))
+        y_axis_high=(float(datasource['CPIAUCSL'].max())) + (float(datasource['CPIAUCSL'].max() * 1.5))
 
 
         plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-        plot.line(x=datasource['DATE'], y=datasource['DGS10'], line_width=2)
+        plot.line(x=datasource['DATE'], y=datasource['CPIAUCSL'], line_width=2)
 
         plot.xaxis.axis_label = "Year"
         plot.xaxis.axis_label_standoff = 10
@@ -195,6 +198,8 @@ def show_dashboard():
     plots.append(Real_GDP_Plot())
     if some_plot():
         plots.append(some_plot())
+    if some_plot1():
+        plots.append(some_plot1())
     if file_plot():
         plots.append(file_plot())
 
