@@ -89,7 +89,7 @@ def Real_GDP_Plot():
 def some_plot():
 
     if 'select' in request.form:
-        if (request.method == 'POST' and request.form['select'] == '1'):
+        if (request.method == 'POST'):
             api= request.form['api']
             datasource= fr.series.observations(api)
             title= str(fr.series.details(api).title.values)
@@ -99,8 +99,8 @@ def some_plot():
             y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
             y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
 
-            multiple= float(request.form['multiple'])
-            datasource['value']*=multiple
+            #multiple= float(request.form['multiple'])
+            #datasource['value']*=multiple
 
             plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
             plot.line(source=datasource, x='date', y='value',  line_width=2)
@@ -215,10 +215,10 @@ def show_dashboard():
     plots.append(Real_GDP_Plot())
     if some_plot():
         plots.append(some_plot())
-    if some_plot1():
-        plots.append(some_plot1())
-    if file_plot():
-        plots.append(file_plot())
+    #if some_plot1():
+    #    plots.append(some_plot1())
+    #if file_plot():
+    #    plots.append(file_plot())
 
 
 
