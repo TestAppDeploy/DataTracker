@@ -38,6 +38,8 @@ configure_uploads(app, data)
 #Define Graph Data Source
 Urban_Index = fr.series.observations('CPIAUCSL')
 Real_GDP = fr.series.observations('A191RL1Q225SBEA')
+SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
+SQLdata.to_sql('users', con=engine)
 
 #Create Graph
 def Urban_Index_Plot():
