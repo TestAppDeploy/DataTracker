@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request
+from app import app, db
 import os
-from config import Config
+from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import send_from_directory
@@ -21,26 +22,30 @@ ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xml', 'json'])
 
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
 
-
-app = Flask(__name__, static_folder='../static/dist', template_folder='../static/client')
-
 data = UploadSet('data', DATA)
 
 app.config['UPLOADED_DATA_DEST'] = './Uploads'
 configure_uploads(app, data)
 
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+class Config(object):
+    # ...
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User %r>' % self.username
+
+
 
 
 #Define Graph Data Source
