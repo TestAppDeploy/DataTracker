@@ -16,13 +16,8 @@ from flask_uploads import UploadSet, configure_uploads, DATA, DOCUMENTS
 import sys
 
 app = Flask(__name__, static_folder='../../static/dist', template_folder='../../static/client')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
-
-from config import Config
-
-app.config.from_object(Config)
-
-migrate = Migrate(app, db)
 
 UPLOAD_FOLDER = './Uploads'
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xml', 'json'])
@@ -39,7 +34,7 @@ configure_uploads(app, data)
 Urban_Index = fr.series.observations('CPIAUCSL')
 Real_GDP = fr.series.observations('A191RL1Q225SBEA')
 SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
-SQLdata.to_sql('users', con=engine)
+SQLdata.to_sql('Data7', con=db.engine, index=False, if_exists='replace')
 
 #Create Graph
 def Urban_Index_Plot():
