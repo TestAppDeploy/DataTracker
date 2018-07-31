@@ -1,7 +1,5 @@
 from flask import Flask, render_template, jsonify, request
-from app import app, db
 import os
-from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import send_from_directory
@@ -17,6 +15,15 @@ from werkzeug.utils import secure_filename
 from flask_uploads import UploadSet, configure_uploads, DATA, DOCUMENTS
 import sys
 
+app = Flask(__name__, static_folder='../../static/dist', template_folder='../../static/client')
+db = SQLAlchemy(app)
+
+from config import Config
+
+app.config.from_object(Config)
+
+migrate = Migrate(app, db)
+
 UPLOAD_FOLDER = './Uploads'
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xml', 'json'])
 
@@ -26,26 +33,6 @@ data = UploadSet('data', DATA)
 
 app.config['UPLOADED_DATA_DEST'] = './Uploads'
 configure_uploads(app, data)
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-
-class Config(object):
-    # ...
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
-
 
 
 #Define Graph Data Source
