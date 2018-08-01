@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_from_directory
 import datetime as datetime
 import os
+import random as random
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from decimal import Decimal
@@ -66,7 +67,7 @@ def Real_GDP_Plot():
     return script, div
 
 class Graph(db.Model):
-    apiCol = db.Column(db.String(300), primary_key=True, nullable=False) #API Nullable was originally false. How will the dataset be referenced without api?
+    id = db.Column(db.Integer, primary_key=True, nullable=True)
     date = db.Column(db.String(200))
     value = db.Column(db.String(200))
     title = db.Column(db.String(200))
@@ -75,7 +76,7 @@ class Graph(db.Model):
     y_axis_high = db.Column(db.Float())
 
     def __repr__(self):
-        return '<Graph %r>' % self.title
+        return '<Graph %r>' % self.id
 
 #SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
 
@@ -86,7 +87,7 @@ def some_plot():
         if (request.form):
             api = request.form['api']
             datasource= fr.series.observations(api)
-            api_plot = Graph(apiCol=str(api))
+            #api_plot = Graph(apiCol=str(api))
             date = Graph(date=str(datasource['date']))
             val1=str(datasource['value'])
             val1=val1[1:]
@@ -100,7 +101,7 @@ def some_plot():
             y_axis_low=Graph(y_axis_low=(min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)))
             y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
 
-            db.session.add(api_plot)
+            #db.session.add(id)
             db.session.add(date)
             db.session.add(value)
             db.session.add(title)
@@ -109,23 +110,23 @@ def some_plot():
             db.session.add(y_axis_high)
             db.session.commit()
 
-            #q = Graph.query.filter_by(id='1')
+            q = Graph.query.first()
             #multiple= float(request.form['multiple'])
             #datasource['value']*=multiple
 
-            plot = figure(y_range=[db.session.query(y_axis_low), db.session.query(y_axis_high)], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(x=query.date.all(), y=query.value.all(), line_width=2)
+            plot = figure(y_range=[q.y_axis_low, q.y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(x=q.date, y=q.value, line_width=2)
 
             plot.toolbar.logo = None
             plot.xaxis.axis_label = "Year"
             plot.xaxis.axis_label_standoff = 10
             plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = query.y_axis_label.first()
+            plot.yaxis.axis_label = q.y_axis_label
             plot.xaxis.axis_label_standoff = 10
             plot.yaxis.axis_label_text_font_style = "normal"
             plot.add_tools(hover)
 
-            plot.add_layout(Title(text=Graph.title, align="center"), "above")
+            plot.add_layout(Title(text=q.title, align="center"), "above")
 
             script, div = components(plot)
             return script, div
