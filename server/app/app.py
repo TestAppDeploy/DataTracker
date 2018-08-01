@@ -68,7 +68,7 @@ def Real_GDP_Plot():
 
 class Graph(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=True)
-    date = db.Column(db.Date())
+    date = db.Column(db.String(200))
     value = db.Column(db.Float())
     title = db.Column(db.String(200))
     y_axis_label = db.Column(db.String(200))
@@ -118,9 +118,8 @@ def show_dashboard():
         #api_plot = Graph(apiCol=str(api))
     #    for d in datasource['date']
     #        d.dt
-        date = Graph(date=datasource['date'])
-        val1=float(datasource['value'])
-        val1=val1[1:]
+        date = Graph(date=str(datasource['date']))
+        val1=float(datasource['value'].iloc[0])
         value = Graph(date=val1)
         title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
