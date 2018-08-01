@@ -1,8 +1,8 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
+import datetime as datetime
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask import send_from_directory
 from decimal import Decimal
 import pandas as pd
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
@@ -19,22 +19,12 @@ app = Flask(__name__, static_folder='../../static/dist', template_folder='../../
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
 
-UPLOAD_FOLDER = './Uploads'
-ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xml', 'json'])
-
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
-
-data = UploadSet('data', DATA)
-
-app.config['UPLOADED_DATA_DEST'] = './Uploads'
-configure_uploads(app, data)
 
 
 #Define Graph Data Source
 Urban_Index = fr.series.observations('CPIAUCSL')
 Real_GDP = fr.series.observations('A191RL1Q225SBEA')
-SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
-SQLdata.to_sql('Data7', con=db.engine, index=False, if_exists='replace')
 
 #Create Graph
 def Urban_Index_Plot():
@@ -75,35 +65,66 @@ def Real_GDP_Plot():
     script, div = components(plot)
     return script, div
 
+class Graph(db.Model):
+    api = db.Column(db.String(200), primary_key=True, nullable=False)
+    date = db.Column(db.String(200))
+    value = db.Column(db.Float())
+    title = db.Column(db.String(200))
+    y_axis_label = db.Column(db.String(200))
+    y_axis_low = db.Column(db.Float())
+    y_axis_high = db.Column(db.Float())
+
+    def __repr__(self):
+        return '<Graph %r>' % self.username
+
+#SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
+
+#SQLdata.to_sql('Graph', con=db.engine, index=False, if_exists='replace')
+
 def some_plot():
 
     if 'select' in request.form:
         if (request.method == 'POST'):
-            api= request.form['api']
+            api = request.form['api']
             datasource= fr.series.observations(api)
-            title= str(fr.series.details(api).title.values)
-            title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-            y_axis_label = str(fr.series.details(api).units.values)
-            y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-            y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
-            y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+            api_plot = Graph(api=request.form['api'])
+            date = Graph(date=datasource['date'])
+            value = Graph(date=datasource['value'])
+            title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
+            #title= str(fr.series.details(api).title.values)
+            #title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_label = Graph(y_axis_label=str(fr.series.details(api).units.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
+            #y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_low=Graph(y_axis_low=(min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)))
+            y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
+
+            db.session.add(api_plot)
+            db.session.add(date)
+            db.session.add(value)
+            db.session.add(title)
+            db.session.add(y_axis_label)
+            db.session.add(y_axis_low)
+            db.session.add(y_axis_high)
+            db.session.commit()
+
+            query = Graph.query.filter_by(api).first()
             #multiple= float(request.form['multiple'])
             #datasource['value']*=multiple
 
-            plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(source=datasource, x='date', y='value',  line_width=2)
+            plot = figure(y_range=[Graph.y_axis_low, Graph.y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(x=Graph.date, y=Graph.value, line_width=2)
 
             plot.toolbar.logo = None
             plot.xaxis.axis_label = "Year"
             plot.xaxis.axis_label_standoff = 10
             plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = y_axis_label
+            plot.yaxis.axis_label = Graph.y_axis_label
             plot.xaxis.axis_label_standoff = 10
             plot.yaxis.axis_label_text_font_style = "normal"
             plot.add_tools(hover)
 
-            plot.add_layout(Title(text=title, align="center"), "above")
+            plot.add_layout(Title(text=Graph.title, align="center"), "above")
 
             script, div = components(plot)
             return script, div
@@ -111,88 +132,6 @@ def some_plot():
             return print('string')
     else:
         return print('some_plot did not run')
-
-
-
-def some_plot1():
-    if 'select' in request.form:
-        if (request.method == 'POST' and request.form['select'] == '2'):
-            api= request.form['api']
-            datasource= fr.series.observations(api)
-            title= str(fr.series.details(api).title.values)
-            title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-            y_axis_label = str(fr.series.details(api).units.values)
-            y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-            y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
-            y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
-
-            multiple= float(request.form['multiple'])
-            datasource['value']*=multiple
-
-            plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(source=datasource, x='date', y='value',  line_width=2)
-
-            plot.toolbar.logo = None
-            plot.xaxis.axis_label = "Year"
-            plot.xaxis.axis_label_standoff = 10
-            plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = y_axis_label
-            plot.xaxis.axis_label_standoff = 10
-            plot.yaxis.axis_label_text_font_style = "normal"
-            plot.add_tools(hover)
-
-            plot.add_layout(Title(text=title, align="center"), "above")
-
-            script, div = components(plot)
-            return script, div
-        else:
-            return print('string')
-    else:
-        return print('some_plot1 did not run')
-
-
-
-
-def file_plot():
-
-    if (request.method == 'POST' and 'file' in request.files):
-
-        file = request.files['file']
-
-        filename = data.save(file)
-        url = data.url(filename)
-
-        datasource= pd.read_csv(url)
-
-        print(datasource)
-
-
-        datasource['CPIAUCSL'] = datasource['CPIAUCSL'].apply(pd.to_numeric, errors='coerce')
-        #datasource['DGS10']= datasource[pd.notnull(datasource)]
-        datasource = datasource.dropna(how='any')
-        datasource['DATE']= pd.to_datetime(datasource['DATE'])
-        y_axis_low=(float(datasource['CPIAUCSL'].min())) - (float(datasource['CPIAUCSL'].min() * 3))
-        y_axis_high=(float(datasource['CPIAUCSL'].max())) + (float(datasource['CPIAUCSL'].max() * 1.5))
-
-
-        plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-        plot.line(x=datasource['DATE'], y=datasource['CPIAUCSL'], line_width=2)
-
-        plot.toolbar.logo = None
-        plot.xaxis.axis_label = "Year"
-        plot.xaxis.axis_label_standoff = 10
-        plot.xaxis.axis_label_text_font_style = "normal"
-        plot.xaxis.axis_label_standoff = 10
-        plot.yaxis.axis_label_text_font_style = "normal"
-        plot.add_tools(hover)
-
-        #plot.add_layout(Title(text=title, align="center"), "above")
-
-        script, div = components(plot)
-        return script, div
-    else:
-        return print ('string')
-
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
@@ -204,12 +143,6 @@ def show_dashboard():
     plots.append(Real_GDP_Plot())
     if some_plot():
         plots.append(some_plot())
-    #if some_plot1():
-    #    plots.append(some_plot1())
-    #if file_plot():
-    #    plots.append(file_plot())
-
-
 
     return render_template('index.html', plots=plots)
 
