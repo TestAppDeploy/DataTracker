@@ -115,12 +115,13 @@ def show_dashboard():
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
+        print(datasource['value'])
         #api_plot = Graph(apiCol=str(api))
     #    for d in datasource['date']
     #        d.dt
         date = Graph(date=str(datasource['date']))
-        val1=float(datasource['value'].iloc[0])
-        value = Graph(date=val1)
+        val1=[float(s) for s in datasource.loc[datasource['value']]]
+        value = Graph(value=val1)
         title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
         #title= str(fr.series.details(api).title.values)
