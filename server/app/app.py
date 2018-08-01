@@ -66,16 +66,16 @@ def Real_GDP_Plot():
     return script, div
 
 class Graph(db.Model):
-    api = db.Column(db.String(200), primary_key=True, nullable=False)
+    apiCol = db.Column(db.String(300), primary_key=True, nullable=False) #API Nullable was originally false. How will the dataset be referenced without api?
     date = db.Column(db.String(200))
-    value = db.Column(db.Float())
+    value = db.Column(db.String(200))
     title = db.Column(db.String(200))
     y_axis_label = db.Column(db.String(200))
     y_axis_low = db.Column(db.Float())
     y_axis_high = db.Column(db.Float())
 
     def __repr__(self):
-        return '<Graph %r>' % self.username
+        return '<Graph %r>' % self.title
 
 #SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
 
@@ -83,13 +83,14 @@ class Graph(db.Model):
 
 def some_plot():
 
-    if 'select' in request.form:
-        if (request.method == 'POST'):
+        if (request.form):
             api = request.form['api']
             datasource= fr.series.observations(api)
-            api_plot = Graph(api=request.form['api'])
-            date = Graph(date=datasource['date'])
-            value = Graph(date=datasource['value'])
+            api_plot = Graph(apiCol=str(api))
+            date = Graph(date=str(datasource['date']))
+            val1=str(datasource['value'])
+            val1=val1[1:]
+            value = Graph(date=val1)
             title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
             #title= str(fr.series.details(api).title.values)
@@ -108,18 +109,18 @@ def some_plot():
             db.session.add(y_axis_high)
             db.session.commit()
 
-            query = Graph.query.filter_by(api).first()
+            #q = Graph.query.filter_by(id='1')
             #multiple= float(request.form['multiple'])
             #datasource['value']*=multiple
 
-            plot = figure(y_range=[Graph.y_axis_low, Graph.y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(x=Graph.date, y=Graph.value, line_width=2)
+            plot = figure(y_range=[db.session.query(y_axis_low), db.session.query(y_axis_high)], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(x=query.date.all(), y=query.value.all(), line_width=2)
 
             plot.toolbar.logo = None
             plot.xaxis.axis_label = "Year"
             plot.xaxis.axis_label_standoff = 10
             plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = Graph.y_axis_label
+            plot.yaxis.axis_label = query.y_axis_label.first()
             plot.xaxis.axis_label_standoff = 10
             plot.yaxis.axis_label_text_font_style = "normal"
             plot.add_tools(hover)
@@ -130,8 +131,6 @@ def some_plot():
             return script, div
         else:
             return print('string')
-    else:
-        return print('some_plot did not run')
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
