@@ -68,8 +68,8 @@ def Real_GDP_Plot():
 
 class Graph(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=True)
-    date = db.Column(db.String(200))
-    value = db.Column(db.String(200))
+    date = db.Column(db.Date())
+    value = db.Column(db.Float())
     title = db.Column(db.String(200))
     y_axis_label = db.Column(db.String(200))
     y_axis_low = db.Column(db.Float())
@@ -82,56 +82,24 @@ class Graph(db.Model):
 
 #SQLdata.to_sql('Graph', con=db.engine, index=False, if_exists='replace')
 
-def some_plot():
-
-        if (request.form):
-            api = request.form['api']
-            datasource= fr.series.observations(api)
-            #api_plot = Graph(apiCol=str(api))
-            date = Graph(date=str(datasource['date']))
-            val1=str(datasource['value'])
-            val1=val1[1:]
-            value = Graph(date=val1)
-            title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
-
-            #title= str(fr.series.details(api).title.values)
-            #title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-            y_axis_label = Graph(y_axis_label=str(fr.series.details(api).units.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
-            #y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-            y_axis_low=Graph(y_axis_low=(min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)))
-            y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
-
-            #db.session.add(id)
-            db.session.add(date)
-            db.session.add(value)
-            db.session.add(title)
-            db.session.add(y_axis_label)
-            db.session.add(y_axis_low)
-            db.session.add(y_axis_high)
-            db.session.commit()
-
-            q = Graph.query.first()
-            #multiple= float(request.form['multiple'])
-            #datasource['value']*=multiple
-
-            plot = figure(y_range=[q.y_axis_low, q.y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(x=q.date, y=q.value, line_width=2)
+def some_plot2():
+            plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(x=Graph.query.with_entities(Graph.date).all(), y=Graph.query.with_entities(Graph.value).all(), line_width=2)
 
             plot.toolbar.logo = None
             plot.xaxis.axis_label = "Year"
             plot.xaxis.axis_label_standoff = 10
             plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = q.y_axis_label
+            plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
             plot.xaxis.axis_label_standoff = 10
             plot.yaxis.axis_label_text_font_style = "normal"
             plot.add_tools(hover)
 
-            plot.add_layout(Title(text=q.title, align="center"), "above")
+            plot.add_layout(Title(text='a'), "above")
 
             script, div = components(plot)
             return script, div
-        else:
-            return print('string')
+
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
@@ -141,10 +109,42 @@ def show_dashboard():
 #Call Graph Function
     plots.append(Urban_Index_Plot())
     plots.append(Real_GDP_Plot())
-    if some_plot():
-        plots.append(some_plot())
+    if some_plot2():
+        plots.append(some_plot2())
+
+    if (request.form):
+        api = request.form['api']
+        datasource= fr.series.observations(api)
+        #api_plot = Graph(apiCol=str(api))
+    #    for d in datasource['date']
+    #        d.dt
+        date = Graph(date=datasource['date'])
+        val1=float(datasource['value'])
+        val1=val1[1:]
+        value = Graph(date=val1)
+        title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
+
+        #title= str(fr.series.details(api).title.values)
+        #title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+        y_axis_label = Graph(y_axis_label=str(fr.series.details(api).units.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
+        #y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+        y_axis_low=Graph(y_axis_low=(min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)))
+        y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
+
+        #db.session.add(id)
+        db.session.add(date)
+        db.session.add(value)
+        db.session.add(title)
+        db.session.add(y_axis_label)
+        db.session.add(y_axis_low)
+        db.session.add(y_axis_high)
+        db.session.commit()
+
+        #multiple= float(request.form['multiple'])
+        #datasource['value']*=multiple
 
     return render_template('index.html', plots=plots)
+
 
 #Tool Parameters
 
