@@ -23,7 +23,7 @@ fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
 #Create Table
 class Graph(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=True)
-    date = db.Column(db.DateTime)
+    date = db.Column(db.Date)
     value = db.Column(db.Float)
     title = db.Column(db.String(200))
     y_axis_label = db.Column(db.String(200))
@@ -39,24 +39,6 @@ class Graph(db.Model):
 
 
 
-def some_plot2():
-            plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(x=Graph.query.with_entities(Graph.date).all(), y=Graph.query.with_entities(Graph.value).all(), line_width=2)
-
-            plot.toolbar.logo = None
-            plot.xaxis.axis_label = "Year"
-            plot.xaxis.axis_label_standoff = 10
-            plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
-            plot.xaxis.axis_label_standoff = 10
-            plot.yaxis.axis_label_text_font_style = "normal"
-            plot.add_tools(hover)
-
-            plot.add_layout(Title(text='a'), "above")
-
-            script, div = components(plot)
-            return script, div
-
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
@@ -64,20 +46,53 @@ def some_plot2():
 def show_dashboard():
     plots = []
 #Call Graph Function
-    if some_plot2():
-        plots.append(some_plot2())
 
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
         #datasource.to_sql(name='Graph', con=database_file, if_exists='replace')
-        print(datasource)
         #api_plot = Graph(apiCol=str(api))
     #    for d in datasource['date']
     #        d.dt
-        date = Graph(date=datasource['date'].iloc[0])
+        index=[1,2,3,4,5]
+        for n in index:
+            d = datasource['date'].iloc[n]
+            date = Graph(date = d)
+            db.session.add(date)
+            print (d)
 
-        value = Graph(value= float(datasource['value'].iloc[0]))
+        for n in index:
+            v = datasource['value'].iloc[n]
+            value = Graph(value= v)
+            db.session.add(value)
+            print (v)
+
+
+        def some_plot2():
+                    plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+                    plot.line(x=datasource['date'], y=datasource['value'], line_width=2)
+
+                    plot.toolbar.logo = None
+                    plot.xaxis.axis_label = "Year"
+                    plot.xaxis.axis_label_standoff = 10
+                    plot.xaxis.axis_label_text_font_style = "normal"
+                    plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
+                    plot.xaxis.axis_label_standoff = 10
+                    plot.yaxis.axis_label_text_font_style = "normal"
+                    plot.add_tools(hover)
+
+                    plot.add_layout(Title(text='a'), "above")
+
+                    script, div = components(plot)
+                    return script, div
+
+
+    #    datasource['date'] = pd.to_datetime(datasource['date'])
+
+
+
+
+
         title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
         #title= str(fr.series.details(api).title.values)
@@ -88,8 +103,8 @@ def show_dashboard():
         y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
 
         #db.session.add(id)
-        db.session.add(date)
-        db.session.add(value)
+
+
         db.session.add(title)
         db.session.add(y_axis_label)
         db.session.add(y_axis_low)
@@ -99,6 +114,9 @@ def show_dashboard():
         #multiple= float(request.form['multiple'])
         #datasource['value']*=multiple
 
+        if some_plot2():
+            plots.append(some_plot2())
+            
     return render_template('index.html', plots=plots)
 
 
