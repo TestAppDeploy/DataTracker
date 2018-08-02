@@ -37,7 +37,81 @@ class Graph(db.Model):
 
 #SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
 
+Urban_Index = fr.series.observations('CPIAUCSL')
 
+#Create Graph
+def Urban_Index_Plot():
+
+    plot = figure(y_range=[0, 280], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+    plot.line(source=Urban_Index, x='date', y='value',  line_width=4)
+
+    plot.xaxis.axis_label = "Year"
+    plot.xaxis.axis_label_standoff = 10
+    plot.xaxis.axis_label_text_font_style = "normal"
+    plot.yaxis.axis_label = "Index 1982-1984=100"
+    plot.xaxis.axis_label_standoff = 10
+    plot.yaxis.axis_label_text_font_style = "normal"
+    plot.add_tools(hover)
+
+    plot.add_layout(Title(text="Consumer Price Index for All Urban Consumers", align="center"), "above")
+
+    script, div = components(plot)
+    return script, div
+
+def some_plot():
+
+    if 'select' in request.form:
+        if (request.method == 'POST'):
+            api= request.form['api']
+            datasource= fr.series.observations(api)
+            title= str(fr.series.details(api).title.values)
+            title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_label = str(fr.series.details(api).units.values)
+            y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+            y_axis_low=min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)
+            y_axis_high=max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)
+
+            #multiple= float(request.form['multiple'])
+            #datasource['value']*=multiple
+
+            plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(source=datasource, x='date', y='value',  line_width=2)
+
+            plot.toolbar.logo = None
+            plot.xaxis.axis_label = "Year"
+            plot.xaxis.axis_label_standoff = 10
+            plot.xaxis.axis_label_text_font_style = "normal"
+            plot.yaxis.axis_label = y_axis_label
+            plot.xaxis.axis_label_standoff = 10
+            plot.yaxis.axis_label_text_font_style = "normal"
+            plot.add_tools(hover)
+
+            plot.add_layout(Title(text=title, align="center"), "above")
+
+            script, div = components(plot)
+            return script, div
+        else:
+            return print('string')
+    else:
+        return print('some_plot did not run')
+
+def some_plot2():
+            plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+            plot.line(x=Graph.query.with_entities(Graph.date).all(), y=Graph.query.with_entities(Graph.value).all(), line_width=2)
+
+            plot.toolbar.logo = None
+            plot.xaxis.axis_label = "Year"
+            plot.xaxis.axis_label_standoff = 10
+            plot.xaxis.axis_label_text_font_style = "normal"
+            plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
+            plot.xaxis.axis_label_standoff = 10
+            plot.yaxis.axis_label_text_font_style = "normal"
+            plot.add_tools(hover)
+
+            plot.add_layout(Title(text='a'), "above")
+
+            script, div = components(plot)
+            return script, div
 
 
 #Render Webpage#
@@ -46,77 +120,14 @@ class Graph(db.Model):
 def show_dashboard():
     plots = []
 #Call Graph Function
+    plots.append(Urban_Index_Plot())
+    if some_plot():
+        plots.append(some_plot())
 
-    if (request.form):
-        api = request.form['api']
-        datasource= fr.series.observations(api)
-        #datasource.to_sql(name='Graph', con=database_file, if_exists='replace')
-        #api_plot = Graph(apiCol=str(api))
-    #    for d in datasource['date']
-    #        d.dt
-        index=[1,2,3,4,5]
-        for n in index:
-            d = datasource['date'].iloc[n]
-            date = Graph(date = d)
-            db.session.add(date)
-            print (d)
-
-        for n in index:
-            v = datasource['value'].iloc[n]
-            value = Graph(value= v)
-            db.session.add(value)
-            print (v)
-
-
-        def some_plot2():
-                    plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-                    plot.line(x=datasource['date'], y=datasource['value'], line_width=2)
-
-                    plot.toolbar.logo = None
-                    plot.xaxis.axis_label = "Year"
-                    plot.xaxis.axis_label_standoff = 10
-                    plot.xaxis.axis_label_text_font_style = "normal"
-                    plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
-                    plot.xaxis.axis_label_standoff = 10
-                    plot.yaxis.axis_label_text_font_style = "normal"
-                    plot.add_tools(hover)
-
-                    plot.add_layout(Title(text='a'), "above")
-
-                    script, div = components(plot)
-                    return script, div
-
-
-    #    datasource['date'] = pd.to_datetime(datasource['date'])
-
-
-
-
-
-        title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
-
-        #title= str(fr.series.details(api).title.values)
-        #title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_label = Graph(y_axis_label=str(fr.series.details(api).units.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
-        #y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
-        y_axis_low=Graph(y_axis_low=(min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)))
-        y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
-
-        #db.session.add(id)
-
-
-        db.session.add(title)
-        db.session.add(y_axis_label)
-        db.session.add(y_axis_low)
-        db.session.add(y_axis_high)
-        db.session.commit()
 
         #multiple= float(request.form['multiple'])
         #datasource['value']*=multiple
 
-        if some_plot2():
-            plots.append(some_plot2())
-            
     return render_template('index.html', plots=plots)
 
 

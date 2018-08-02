@@ -1,0 +1,43 @@
+if (request.form and request.form['select'] == '5'):
+      api = request.form['api']
+      datasource= fr.series.observations(api)
+      datasource.to_sql(name='Graph', con=db.engine, if_exists='replace')
+      #api_plot = Graph(apiCol=str(api))
+  #    for d in datasource['date']
+  #        d.dt
+      index=[1,2,3,4,5]
+      for n in index:
+          d = datasource['date'].iloc[n]
+          date = Graph(date = d)
+          db.session.add(date)
+          print (d)
+
+      for n in index:
+          v = datasource['value'].iloc[n]
+          value = Graph(value= v)
+          db.session.add(value)
+          print (v)
+
+  #    datasource['date'] = pd.to_datetime(datasource['date'])
+
+
+
+
+
+      title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
+
+      #title= str(fr.series.details(api).title.values)
+      #title=title.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+      y_axis_label = Graph(y_axis_label=str(fr.series.details(api).units.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
+      #y_axis_label=y_axis_label.replace("[", "").replace("]", "").replace("''", "").replace("'", "")
+      y_axis_low=Graph(y_axis_low=(min(fr.series.observations(api)['value']) - (min(fr.series.observations(api)['value']) * 5)))
+      y_axis_high=Graph(y_axis_high=(max(fr.series.observations(api)['value']) + (max(fr.series.observations(api)['value']) * 1.5)))
+
+      #db.session.add(id)
+
+
+      db.session.add(title)
+      db.session.add(y_axis_label)
+      db.session.add(y_axis_low)
+      db.session.add(y_axis_high)
+      db.session.commit()
