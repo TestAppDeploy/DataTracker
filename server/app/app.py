@@ -1,10 +1,6 @@
 from flask import Flask, render_template, jsonify, request, send_from_directory
 import datetime as datetime
-import os
-import random as random
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from decimal import Decimal
 import pandas as pd
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
 from bokeh.layouts import row, widgetbox
@@ -12,64 +8,22 @@ from bokeh.embed import components
 from bokeh.models.sources import AjaxDataSource
 from bokeh.models import ColumnDataSource, CDSView, IndexFilter, Title, TapTool, HoverTool, CustomJS, Slider
 from fred import Fred
-from werkzeug.utils import secure_filename
-from flask_uploads import UploadSet, configure_uploads, DATA, DOCUMENTS
-import sys
+import os
+
+project_dir = os.path.dirname(os.path.abspath(__file__))
+database_file = "sqlite:///{}".format(os.path.join(project_dir, "app.db"))
 
 app = Flask(__name__, static_folder='../../static/dist', template_folder='../../static/client')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = database_file
+
 db = SQLAlchemy(app)
 
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
 
-
-#Define Graph Data Source
-Urban_Index = fr.series.observations('CPIAUCSL')
-Real_GDP = fr.series.observations('A191RL1Q225SBEA')
-
-#Create Graph
-def Urban_Index_Plot():
-
-    plot = figure(y_range=[0, 280], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-    plot.line(source=Urban_Index, x='date', y='value',  line_width=4)
-
-    plot.toolbar.logo = None
-    plot.xaxis.axis_label = "Year"
-    plot.xaxis.axis_label_standoff = 10
-    plot.xaxis.axis_label_text_font_style = "normal"
-    plot.yaxis.axis_label = "Index 1982-1984=100"
-    plot.xaxis.axis_label_standoff = 10
-    plot.yaxis.axis_label_text_font_style = "normal"
-    plot.add_tools(hover)
-
-    plot.add_layout(Title(text="Consumer Price Index for All Urban Consumers", align="center"), "above")
-
-    script, div = components(plot)
-    return script, div
-
-def Real_GDP_Plot():
-
-    plot = figure(y_range=[-15, 20], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-    plot.line(source=Real_GDP, x='date', y='value',  line_width=2)
-
-    plot.toolbar.logo = None
-    plot.xaxis.axis_label = "Year"
-    plot.xaxis.axis_label_standoff = 10
-    plot.xaxis.axis_label_text_font_style = "normal"
-    plot.yaxis.axis_label = "% Change from Preceding Period"
-    plot.xaxis.axis_label_standoff = 10
-    plot.yaxis.axis_label_text_font_style = "normal"
-    plot.add_tools(hover)
-
-    plot.add_layout(Title(text="Real GDP", align="center"), "above")
-
-    script, div = components(plot)
-    return script, div
-
 #Create Table
 class Graph(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=True)
-    date = db.Column(db.String(200))
+    date = db.Column(db.DateTime)
     value = db.Column(db.Float)
     title = db.Column(db.String(200))
     y_axis_label = db.Column(db.String(200))
@@ -79,10 +33,11 @@ class Graph(db.Model):
     def __repr__(self):
         return '<Graph %r>' % self.id
 #Create Table
+#SQLdata.to_sql('User', con=db.engine, index=False, if_exists='replace')
 
 #SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
 
-#SQLdata.to_sql('Graph', con=db.engine, index=False, if_exists='replace')
+
 
 def some_plot2():
             plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
@@ -109,22 +64,20 @@ def some_plot2():
 def show_dashboard():
     plots = []
 #Call Graph Function
-    plots.append(Urban_Index_Plot())
-    plots.append(Real_GDP_Plot())
     if some_plot2():
         plots.append(some_plot2())
 
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
-        datasource.to_sql(name='Graph', con=db.engine, if_exists='replace')
+        #datasource.to_sql(name='Graph', con=database_file, if_exists='replace')
         print(datasource)
         #api_plot = Graph(apiCol=str(api))
     #    for d in datasource['date']
     #        d.dt
-        date = Graph(date=str(datasource['date']))
+        date = Graph(date=datasource['date'].iloc[0])
 
-        value = Graph(value= datasource['value'].astype(float))
+        value = Graph(value= float(datasource['value'].iloc[0]))
         title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
         #title= str(fr.series.details(api).title.values)
@@ -156,10 +109,6 @@ hover = HoverTool(tooltips=[
  formatters={
         'date' : 'datetime', # use 'datetime' formatter for 'date' field
     })
-
-
-
-
 
 
 if __name__ == '__main__':
