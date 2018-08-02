@@ -66,17 +66,19 @@ def Real_GDP_Plot():
     script, div = components(plot)
     return script, div
 
+#Create Table
 class Graph(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=True)
     date = db.Column(db.String(200))
-    value = db.Column(db.String(200))
+    value = db.Column(db.Float)
     title = db.Column(db.String(200))
     y_axis_label = db.Column(db.String(200))
-    y_axis_low = db.Column(db.Float())
-    y_axis_high = db.Column(db.Float())
+    y_axis_low = db.Column(db.Float)
+    y_axis_high = db.Column(db.Float)
 
     def __repr__(self):
         return '<Graph %r>' % self.id
+#Create Table
 
 #SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
 
@@ -115,14 +117,14 @@ def show_dashboard():
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
+        datasource.to_sql(name='Graph', con=db.engine, if_exists='replace')
         print(datasource)
         #api_plot = Graph(apiCol=str(api))
     #    for d in datasource['date']
     #        d.dt
         date = Graph(date=str(datasource['date']))
-        valsource = datasource.iloc[:,3].apply(float)
 
-        value = Graph(value= str(valsource))
+        value = Graph(value= datasource['value'].astype(float))
         title = Graph(title=str(fr.series.details(api).title.values).replace("[", "").replace("]", "").replace("''", "").replace("'", ""))
 
         #title= str(fr.series.details(api).title.values)
