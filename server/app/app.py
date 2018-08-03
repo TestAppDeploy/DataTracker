@@ -117,9 +117,9 @@ def show_dashboard():
 #Tool Parameters
 
 hover = HoverTool(tooltips=[
-("Date", "@date{'%F'}"),  ("Value", "@value"), ],
+("Date", "@x{%F}"),  ("Value", "@y"), ],
  formatters={
-        'date' : 'datetime', # use 'datetime' formatter for 'date' field
+        '@x' : 'datetime', # use 'datetime' formatter for 'date' field
     })
 
 
