@@ -10,6 +10,11 @@
   max-width: 400px;
 }
 
+.bk-toolbar-button.bk-tool-icon-help
+{
+  visibility: hidden;
+  display: none;
+}
 
 #a{
   color: red;
