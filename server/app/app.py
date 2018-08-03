@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
 
 #Create Table
-class Graph(db.Model):
+class blank(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=True)
     date = db.Column(db.DateTime)
     value = db.Column(db.String(200))
@@ -32,30 +32,27 @@ class Graph(db.Model):
 
     def __repr__(self):
         return '<Graph %r>' % self.id
-#Create Table
-#SQLdata.to_sql('User', con=db.engine, index=False, if_exists='replace')
 
-#SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
 
 
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
 
-
-
-
-
 def show_dashboard():
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
-        datasource.to_sql('Graph1', con=db.engine, if_exists='replace')
+        datasource.to_sql('Graph1', con=db.engine, index=False, if_exists='replace')
 
     dataframe=pd.read_sql('Graph1', con=db.engine)
 
     def some_plot2():
-                plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+
+                y_axis_low=(min(dataframe['value']) - (min(dataframe['value']) * 5))
+                y_axis_high=(max(dataframe['value']) + (max(dataframe['value']) * 1.5))
+
+                plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
                 plot.line(x=dataframe['date'], y=dataframe['value'], line_width=2)
 
                 plot.toolbar.logo = None
@@ -72,31 +69,15 @@ def show_dashboard():
                 script, div = components(plot)
                 return script, div
     plots = []
-#    if some_plot1():
-#        plots.append(some_plot1())
+
     if some_plot2():
         plots.append(some_plot2())
 
 
     return render_template('index.html', plots=plots)
-#Call Graph Function
 
 
 
-    #    datasource['date'] = pd.to_datetime(datasource['date'])
-    #api_plot = Graph(apiCol=str(api))
-#    for d in datasource['date']
-#        d.dt
-    #index=[1,2,3,4,5]
-    #for n in index:
-    #    d = datasource['date'].iloc[n]
-    #    date = Graph(date = d)
-    #    db.session.add(date)
-    #    print (d)
-
-#    value = Graph(value= datasource['value'].apply(lambda x: float(x)))
-#    db.session.add(value)
-#    print (value)
 
 #    print(Graph.query.with_entities(Graph.date).first())
 
