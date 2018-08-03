@@ -43,9 +43,14 @@ def show_dashboard():
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
+        labelsource= fr.series.details(api)
         datasource.to_sql('Graph1', con=db.engine, index=False, if_exists='replace')
+        labelsource.to_sql('Labels', con=db.engine, index=False, if_exists='replace')
 
     dataframe=pd.read_sql('Graph1', con=db.engine)
+    labelframe=pd.read_sql('Labels', con=db.engine)
+
+    print(labelframe['title'].iloc[0])
 
     def some_plot2():
 
@@ -64,7 +69,7 @@ def show_dashboard():
                 plot.yaxis.axis_label_text_font_style = "normal"
                 plot.add_tools(hover)
 
-                plot.add_layout(Title(text='a'), "above")
+                plot.add_layout(Title(text=labelframe['title'].iloc[0], align="center"), "above")
 
                 script, div = components(plot)
                 return script, div
