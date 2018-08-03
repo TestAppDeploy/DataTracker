@@ -64,7 +64,7 @@ def show_dashboard():
                 plot.xaxis.axis_label = "Year"
                 plot.xaxis.axis_label_standoff = 10
                 plot.xaxis.axis_label_text_font_style = "normal"
-                plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
+                plot.yaxis.axis_label = labelframe['units'].iloc[0]
                 plot.xaxis.axis_label_standoff = 10
                 plot.yaxis.axis_label_text_font_style = "normal"
                 plot.add_tools(hover)
