@@ -36,42 +36,47 @@ class Graph(db.Model):
 #SQLdata.to_sql('User', con=db.engine, index=False, if_exists='replace')
 
 #SQLdata = pd.DataFrame(fr.series.observations('A191RL1Q225SBEA'))
-def some_plot1():
-    if (request.form):
-        api = request.form['api']
-        datasource= fr.series.observations(api)
-        datasource.to_sql('Graph', con=db.engine, if_exists='replace')
-
-        print(Graph.query.with_entities(Graph.value))
-
-dataframe=pd.read_sql('Graph', con=db.engine)
-def some_plot2():
-            plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
-            plot.line(x=dataframe['date'], y=dataframe['value'], line_width=2)
-
-            plot.toolbar.logo = None
-            plot.xaxis.axis_label = "Year"
-            plot.xaxis.axis_label_standoff = 10
-            plot.xaxis.axis_label_text_font_style = "normal"
-            plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
-            plot.xaxis.axis_label_standoff = 10
-            plot.yaxis.axis_label_text_font_style = "normal"
-            plot.add_tools(hover)
-
-            plot.add_layout(Title(text='a'), "above")
-
-            script, div = components(plot)
-            return script, div
 
 
 
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
 
+
+
+
+
 def show_dashboard():
+    if (request.form):
+        api = request.form['api']
+        datasource= fr.series.observations(api)
+        datasource.to_sql('Graph', con=db.engine, if_exists='replace')
+
+    dataframe=pd.read_sql('Graph', con=db.engine)
+
+    def some_plot2():
+                plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+                plot.line(x=dataframe['date'], y=dataframe['value'], line_width=2)
+
+                plot.toolbar.logo = None
+                plot.xaxis.axis_label = "Year"
+                plot.xaxis.axis_label_standoff = 10
+                plot.xaxis.axis_label_text_font_style = "normal"
+                plot.yaxis.axis_label = 'Graph.query.with_entities(Graph.y_axis_label).first()'
+                plot.xaxis.axis_label_standoff = 10
+                plot.yaxis.axis_label_text_font_style = "normal"
+                plot.add_tools(hover)
+
+                plot.add_layout(Title(text='a'), "above")
+
+                script, div = components(plot)
+                return script, div
     plots = []
+#    if some_plot1():
+#        plots.append(some_plot1())
     if some_plot2():
         plots.append(some_plot2())
+
 
     return render_template('index.html', plots=plots)
 #Call Graph Function
