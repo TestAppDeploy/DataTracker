@@ -50,9 +50,9 @@ def show_dashboard():
     if (request.form):
         api = request.form['api']
         datasource= fr.series.observations(api)
-        datasource.to_sql('Graph', con=db.engine, if_exists='replace')
+        datasource.to_sql('Graph1', con=db.engine, if_exists='replace')
 
-    dataframe=pd.read_sql('Graph', con=db.engine)
+    dataframe=pd.read_sql('Graph1', con=db.engine)
 
     def some_plot2():
                 plot = figure(y_range=[-100, 100], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
