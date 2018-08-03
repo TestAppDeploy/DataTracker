@@ -20,27 +20,11 @@ db = SQLAlchemy(app)
 
 fr = Fred(api_key='9191e886eb8b7e932d92df410fbf0c9e',response_type='df')
 
-#Create Table
-class blank(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=True)
-    date = db.Column(db.DateTime)
-    value = db.Column(db.String(200))
-    title = db.Column(db.String(200))
-    y_axis_label = db.Column(db.String(200))
-    y_axis_low = db.Column(db.Float)
-    y_axis_high = db.Column(db.Float)
-
-    def __repr__(self):
-        return '<Graph %r>' % self.id
-
-
-
-
 #Render Webpage#
 @app.route('/', methods=['GET', 'POST'])
 
 def show_dashboard():
-    if (request.form):
+    if (request.form and request.form['select'] == '1'):
         api = request.form['api']
         datasource= fr.series.observations(api)
         labelsource= fr.series.details(api)
@@ -49,8 +33,6 @@ def show_dashboard():
 
     dataframe=pd.read_sql('Graph1', con=db.engine)
     labelframe=pd.read_sql('Labels', con=db.engine)
-
-    print(labelframe['title'].iloc[0])
 
     def some_plot2():
 
@@ -73,10 +55,44 @@ def show_dashboard():
 
                 script, div = components(plot)
                 return script, div
+
+    if (request.form and request.form['select'] == '2'):
+        api2 = request.form['api']
+        datasource2= fr.series.observations(api2)
+        labelsource2= fr.series.details(api2)
+        datasource2.to_sql('Graph2', con=db.engine, index=False, if_exists='replace')
+        labelsource2.to_sql('Labels2', con=db.engine, index=False, if_exists='replace')
+
+    dataframe2=pd.read_sql('Graph2', con=db.engine)
+    labelframe2=pd.read_sql('Labels2', con=db.engine)
+
+    def some_plot3():
+
+                y_axis_low=(min(dataframe2['value']) - (min(dataframe2['value']) * 5))
+                y_axis_high=(max(dataframe2['value']) + (max(dataframe2['value']) * 1.5))
+
+                plot = figure(y_range=[y_axis_low, y_axis_high], plot_height=350, x_axis_type='datetime', sizing_mode='scale_width')
+                plot.line(x=dataframe2['date'], y=dataframe2['value'], line_width=2)
+
+                plot.toolbar.logo = None
+                plot.xaxis.axis_label = "Year"
+                plot.xaxis.axis_label_standoff = 10
+                plot.xaxis.axis_label_text_font_style = "normal"
+                plot.yaxis.axis_label = labelframe2['units'].iloc[0]
+                plot.xaxis.axis_label_standoff = 10
+                plot.yaxis.axis_label_text_font_style = "normal"
+                plot.add_tools(hover)
+
+                plot.add_layout(Title(text=labelframe2['title'].iloc[0], align="center"), "above")
+
+                script, div = components(plot)
+                return script, div
     plots = []
 
     if some_plot2():
         plots.append(some_plot2())
+    if some_plot3():
+        plots.append(some_plot3())
 
 
     return render_template('index.html', plots=plots)
