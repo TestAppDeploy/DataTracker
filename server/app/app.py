@@ -9,12 +9,16 @@ from bokeh.models.sources import AjaxDataSource
 from bokeh.models import ColumnDataSource, CDSView, IndexFilter, Title, TapTool, HoverTool, CustomJS, Slider
 from fred import Fred
 import os
+from flask_frozen import Freezer
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
 
+
 app = Flask(__name__, static_folder='../../static/dist', template_folder='../../static/client')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+
+freezer = Freezer(app)
 
 db = SQLAlchemy(app)
 
@@ -276,3 +280,6 @@ hover = HoverTool(tooltips=[
 
 if __name__ == '__main__':
     app.run(debug=True)
+    freezer.freeze()
+    from elsa import cli
+    cli(app, base_url='http://datatracker.github.io')
