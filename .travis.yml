@@ -1,0 +1,15 @@
+language: python
+python:
+- 3.6
+script:
+- python app.py freeze
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: python app.py deploy --no-freeze --push
+  on:
+    branch: DataApp
+    repo: TestAppDeploy/DataTracker
+env:
+  global:
+    secure: 0c651c3f4a516e3ae5ce8c625fa21de812f84281
