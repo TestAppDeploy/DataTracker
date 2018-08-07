@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org easy_install --user
+=======
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org travis-encrypt --user
+>>>>>>> DataApp
