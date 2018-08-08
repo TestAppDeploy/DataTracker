@@ -70,8 +70,6 @@ pyperclip==1.6.0
 python-dateutil==2.6.1
 python-editor==1.0.3
 pytz==2018.3
-pywin32==223
-pywinpty==0.5.1
 PyYAML==3.12
 pyzmq==17.0.0
 qtconsole==4.3.1
