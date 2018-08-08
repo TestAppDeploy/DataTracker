@@ -1,1 +1,1 @@
-web: gunicorn marketsboiler:app
+web: gunicorn deployapp:app
