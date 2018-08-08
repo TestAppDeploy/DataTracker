@@ -19,7 +19,6 @@ Flask-Bootstrap==3.3.7.1
 Flask-Compress==1.4.0
 Flask-SQLAlchemy==2.3.2
 FRB==1.1.4
-fredapi==0.4.1
 future==0.16.0
 ghp-import==0.5.5
 gunicorn==19.9.0
@@ -33,10 +32,6 @@ itsdangerous==0.24
 jedi==0.11.1
 Jinja2==2.10
 jsonschema==2.6.0
-jupyter==1.0.0
-jupyter-client==5.2.2
-jupyter-console==5.2.0
-jupyter-core==4.4.0
 macholib==1.10
 Mako==1.0.7
 MarkupSafe==1.0
@@ -52,7 +47,6 @@ pandocfilters==1.4.2
 parso==0.1.1
 pefile==2017.11.5
 pickleshare==0.7.4
-plotly==2.7.0
 prompt-toolkit==1.0.15
 pycparser==2.18
 Pygments==2.2.0
@@ -75,8 +69,6 @@ terminado==0.8.1
 testpath==0.3.1
 tornado==4.5.3
 traitlets==4.3.2
-travis==0.0.3
-travis-encrypt==1.1.2
 urllib3==1.22
 visitor==0.1.3
 wcwidth==0.1.7
