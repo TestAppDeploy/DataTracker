@@ -35,11 +35,9 @@ jsonschema==2.6.0
 macholib==1.10
 Mako==1.0.7
 MarkupSafe==1.0
-matplotlib==2.1.2
 mistune==0.8.3
 nbconvert==5.3.1
 nbformat==4.4.0
-notebook==5.4.0
 numpy==1.14.0
 packaging==17.1
 pandas==0.22.0
