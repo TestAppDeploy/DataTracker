@@ -1,5 +1,4 @@
 from flask import Flask, render_template, jsonify, request, send_from_directory
-import datetime as datetime
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
@@ -9,7 +8,7 @@ from bokeh.models.sources import AjaxDataSource
 from bokeh.models import ColumnDataSource, CDSView, IndexFilter, Title, TapTool, HoverTool, CustomJS, Slider
 from fred import Fred
 import os
-from flask_frozen import Freezer
+
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
