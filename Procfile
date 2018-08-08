@@ -1,1 +1,1 @@
-web: gunicorn --chdir deployapp server.appfolder:app
+web: gunicorn --chdir deployapp server.appfolder.app:app
