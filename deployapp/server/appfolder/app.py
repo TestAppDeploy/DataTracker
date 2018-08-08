@@ -17,7 +17,7 @@ project_dir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, static_folder='../../static/dist', template_folder='../../static/client')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 
-freezer = Freezer(app)
+
 
 db = SQLAlchemy(app)
 
